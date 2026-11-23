@@ -1,0 +1,15 @@
+-- parámetros: {'s': 8, 'f': datetime.date(2025, 2, 6)}
+Sort  (cost=2330.02..2330.98 rows=385 width=9) (actual time=1.837..1.864 rows=386.00 loops=1)
+  Sort Key: producto_id
+  Sort Method: quicksort  Memory: 37kB
+  Buffers: shared hit=142 read=3
+  ->  Bitmap Heap Scan on a  (cost=883.03..2313.49 rows=385 width=9) (actual time=1.594..1.743 rows=386.00 loops=1)
+        Recheck Cond: ((sucursal_id = 8) AND (fecha = '2025-02-06'::date))
+        Heap Blocks: exact=3
+        Buffers: shared hit=142 read=3
+        ->  Bitmap Index Scan on a_pkey  (cost=0.00..882.93 rows=385 width=0) (actual time=1.310..1.310 rows=386.00 loops=1)
+              Index Cond: ((sucursal_id = 8) AND (fecha = '2025-02-06'::date))
+              Index Searches: 9
+              Buffers: shared hit=142
+Planning Time: 0.104 ms
+Execution Time: 1.913 ms

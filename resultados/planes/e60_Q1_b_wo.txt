@@ -1,0 +1,7 @@
+-- parámetros: {'s': 14, 'p': 31141, 'f': datetime.date(2025, 3, 28)}
+Index Scan using b_wo_pkey on b_wo  (cost=0.28..8.30 rows=1 width=5) (actual time=0.407..0.423 rows=1.00 loops=1)
+  Index Cond: ((sucursal_id = 14) AND (producto_id = 31141) AND (vigencia @> '2025-03-28'::date))
+  Index Searches: 1
+  Buffers: shared hit=6 read=1
+Planning Time: 0.123 ms
+Execution Time: 0.436 ms

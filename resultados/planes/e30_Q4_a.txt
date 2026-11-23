@@ -1,0 +1,13 @@
+-- parámetros: {}
+GroupAggregate  (cost=0.51..236154.28 rows=216123 width=80) (actual time=0.130..2578.928 rows=81407.00 loops=1)
+  Group Key: a.sucursal_id, a.producto_id
+  Buffers: shared hit=2154050 read=15188
+  ->  WindowAgg  (cost=0.51..185365.33 rows=2161232 width=18) (actual time=0.087..2176.668 rows=2161232.00 loops=1)
+        Window: w AS (PARTITION BY a.sucursal_id, a.producto_id ORDER BY a.fecha)
+        Storage: Memory  Maximum Storage: 17kB
+        Buffers: shared hit=2154050 read=15188
+        ->  Index Scan using a_pkey on a  (cost=0.43..120528.37 rows=2161232 width=17) (actual time=0.075..873.591 rows=2161232.00 loops=1)
+              Index Searches: 1
+              Buffers: shared hit=2154050 read=15188
+Planning Time: 0.120 ms
+Execution Time: 2582.556 ms

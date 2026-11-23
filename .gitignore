@@ -1,0 +1,19 @@
+# entorno de Python
+.venv/
+__pycache__/
+*.pyc
+
+# datos pesados (se regeneran con los scripts)
+*.tar.zst
+*.zip
+*.csv.gz
+*.parcial
+limpio/
+recorte/
+
+# credenciales y archivos locales
+.env
+*.pgpass
+
+# VS Code
+.vscode/

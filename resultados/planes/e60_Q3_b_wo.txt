@@ -1,0 +1,14 @@
+-- parámetros: {'s': 15, 'p': 38057}
+Sort  (cost=80.65..83.15 rows=1000 width=9) (actual time=0.078..0.079 rows=34.00 loops=1)
+  Sort Key: ((g.g)::date)
+  Sort Method: quicksort  Memory: 26kB
+  Buffers: shared hit=7
+  ->  Nested Loop  (cost=0.30..30.82 rows=1000 width=9) (actual time=0.053..0.072 rows=34.00 loops=1)
+        Buffers: shared hit=7
+        ->  Index Scan using b_wo_pkey on b_wo  (cost=0.28..8.30 rows=1 width=17) (actual time=0.044..0.047 rows=3.00 loops=1)
+              Index Cond: ((sucursal_id = 15) AND (producto_id = 38057))
+              Index Searches: 1
+              Buffers: shared hit=7
+        ->  Function Scan on generate_series g  (cost=0.02..10.02 rows=1000 width=8) (actual time=0.005..0.005 rows=11.33 loops=3)
+Planning Time: 0.101 ms
+Execution Time: 0.098 ms

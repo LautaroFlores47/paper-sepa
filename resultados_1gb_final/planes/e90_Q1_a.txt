@@ -1,0 +1,7 @@
+-- parámetros: {'s': 3, 'p': 4629, 'f': datetime.date(2025, 2, 6)}
+Index Scan using a_pkey on a  (cost=0.43..8.45 rows=1 width=5) (actual time=0.059..0.060 rows=1.00 loops=1)
+  Index Cond: ((sucursal_id = 3) AND (producto_id = 4629) AND (fecha = '2025-02-06'::date))
+  Index Searches: 1
+  Buffers: shared hit=3 read=1
+Planning Time: 0.037 ms
+Execution Time: 0.066 ms

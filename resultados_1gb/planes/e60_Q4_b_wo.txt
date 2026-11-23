@@ -1,0 +1,16 @@
+-- parámetros: {}
+GroupAggregate  (cost=22810.59..33545.79 rows=24945 width=80) (actual time=375.117..1022.463 rows=85125.00 loops=1)
+  Group Key: b_wo.sucursal_id, b_wo.producto_id
+  Buffers: shared hit=1226, temp read=847 written=850
+  ->  WindowAgg  (cost=22810.59..29364.17 rows=174763 width=18) (actual time=375.079..827.908 rows=174763.00 loops=1)
+        Window: w AS (PARTITION BY b_wo.sucursal_id, b_wo.producto_id ORDER BY (lower(b_wo.vigencia)))
+        Storage: Memory  Maximum Storage: 17kB
+        Buffers: shared hit=1226, temp read=847 written=850
+        ->  Sort  (cost=22810.56..23247.47 rows=174763 width=29) (actual time=375.043..477.047 rows=174763.00 loops=1)
+              Sort Key: b_wo.sucursal_id, b_wo.producto_id, (lower(b_wo.vigencia))
+              Sort Method: external merge  Disk: 6776kB
+              Buffers: shared hit=1226, temp read=847 written=850
+              ->  Seq Scan on b_wo  (cost=0.00..3410.54 rows=174763 width=29) (actual time=0.060..76.554 rows=174763.00 loops=1)
+                    Buffers: shared hit=1226
+Planning Time: 0.380 ms
+Execution Time: 1035.280 ms

@@ -1,0 +1,7 @@
+-- parámetros: {'s': 2, 'p': 3758}
+Index Scan using a_pkey on a  (cost=0.43..72.53 rows=17 width=9) (actual time=1.738..2.929 rows=90.00 loops=1)
+  Index Cond: ((sucursal_id = 2) AND (producto_id = 3758))
+  Index Searches: 1
+  Buffers: shared hit=1 read=92
+Planning Time: 0.038 ms
+Execution Time: 2.965 ms
