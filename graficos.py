@@ -35,7 +35,7 @@ COL = {"a": "#000000", "b_wo": "#6e6e6e", "b_gist": "#9a9a9a"}
 NOMBRE = {"a": "A (una fila por día)", "b_wo": "B-WO (tramos + WITHOUT OVERLAPS)", "b_gist": "B-GiST (tramos, sin restricción)"}
 TINTA, TINTA2, GRILLA = "#0b0b0b", "#52514e", "#e4e3de"
 plt.rcParams.update({
-    "font.family": "DejaVu Sans", "font.size": 9, "axes.edgecolor": TINTA2, "axes.labelcolor": TINTA,
+    "font.family": "DejaVu Sans", "font.size": 7, "axes.edgecolor": TINTA2, "axes.labelcolor": TINTA,
     "xtick.color": TINTA2, "ytick.color": TINTA2, "axes.spines.top": False, "axes.spines.right": False,
     "axes.grid": True, "grid.color": GRILLA, "grid.linewidth": 0.6, "axes.axisbelow": True,
     "legend.frameon": False, "savefig.facecolor": "white", "figure.facecolor": "white",
@@ -68,7 +68,7 @@ def num(x, dec=1):
 tam = {}
 for r in leer("tamanos.csv"):
     tam[(r["momento"], int(r["escala"]), r["modelo"])] = r   # la última corrida pisa a la anterior
-fig, ax = plt.subplots(figsize=(6.3, 3.0))
+fig, ax = plt.subplots(figsize=(3.2, 2.6))
 escalas = [30, 60, 90]
 ancho = 0.36
 for i, m in enumerate(["a", "b_wo"]):
@@ -79,40 +79,40 @@ for i, m in enumerate(["a", "b_wo"]):
     else:
         ax.bar(xs, vals, width=ancho, color="white", hatch="////", label=NOMBRE[m], edgecolor="black", linewidth=0.8)
     for x, v in zip(xs, vals):
-        ax.text(x, v + 8, f"{num(v)} MB", ha="center", va="bottom", fontsize=8, color=TINTA)
+        ax.text(x, v + 8, f"{num(v)}", ha="center", va="bottom", fontsize=6, color=TINTA)
 for k, e in enumerate(escalas):
     ra = int(tam[("compacto", e, "a")]["bytes_total"]) / int(tam[("compacto", e, "b_wo")]["bytes_total"])
     fa = int(tam[("compacto", e, "a")]["filas"]) / int(tam[("compacto", e, "b_wo")]["filas"])
     RESUMEN.append(f"Espacio {e} días: A/B-WO = {num(ra, 2)} (filas {num(fa, 2)})")
-    ax.text(k, -95, f"A ocupa {num(ra)}× más\n({num(fa)}× más filas)", ha="center", va="top", fontsize=8, color=TINTA2)
+    ax.text(k, -105, f"A/B-WO: {num(ra)}×\nfilas: {num(fa)}×", ha="center", va="top", fontsize=6, color=TINTA2)
 ax.set_xticks(range(3), [f"{e} días" for e in escalas])
 ax.set_ylabel("Tamaño total compacto (MB)")
-ax.set_ylim(0, 620)
+ax.set_ylim(0, 800)
+ax.set_yticks(range(0, 601, 100))
 ax.yaxis.set_major_formatter(coma)
 ax.tick_params(axis="x", length=0, pad=4)
-ax.legend(loc="upper left", fontsize=8)
-ax.set_title("B-WO ocupa entre 14 y 20 veces menos que A", loc="left", fontsize=10, color=TINTA)
-fig.subplots_adjust(bottom=0.28)
+ax.legend(loc="upper left", fontsize=6)
+fig.subplots_adjust(bottom=0.32)
 guardar(fig, "fig1_espacio")
 
 # ------------------------------------------------------------------ Figura 2: carga diaria
 c90 = leer("carga_e90.csv")
-fig, ax = plt.subplots(figsize=(6.3, 3.0))
+fig, ax = plt.subplots(figsize=(3.2, 2.5))
 estilos = {"a": ("-", "o"), "b_gist": (":", "s"), "b_wo": ("--", "^")}
 for m in ["a", "b_gist", "b_wo"]:
     pts = sorted((int(r["dia_n"]), float(r["segundos"])) for r in c90 if r["modelo"] == m)
     ax.plot([p[0] for p in pts], [p[1] for p in pts], ls=estilos[m][0], color=COL[m], lw=1.6,
             marker=estilos[m][1], markersize=3.2, markevery=6, label=NOMBRE[m])
-ax.set_xlabel("Día de carga (escala 90: 01/02 a 01/05/2025)")
+ax.set_xlabel("Día de carga (01/02 a 01/05/2025)")
 ax.set_ylabel("Segundos por día")
 ax.set_xlim(0, 91)
 ax.yaxis.set_major_formatter(coma)
-ax.annotate("día 1: carga inicial", xy=(1, 1.81), xytext=(8, 3.3), fontsize=7.5, color=TINTA2,
+ax.annotate("día 1: carga inicial", xy=(1, 1.81), xytext=(6, 3.4), fontsize=6, color=TINTA2,
             arrowprops=dict(arrowstyle="-", color=TINTA2, lw=0.7))
-ax.annotate("01/05 (feriado): se cierran 35 mil tramos", xy=(90, 1.71), xytext=(28, 3.95), fontsize=7.5,
+ax.annotate("01/05 (feriado):\n35 mil tramos cerrados", xy=(90, 1.71), xytext=(34, 4.1), fontsize=6,
             color=TINTA2, arrowprops=dict(arrowstyle="-", color=TINTA2, lw=0.7))
-ax.legend(loc="upper left", fontsize=8, ncol=1)
-ax.set_title("La carga de A crece con el historial; la de B se mantiene", loc="left", fontsize=10, color=TINTA)
+ax.legend(loc="upper left", fontsize=5.5, ncol=1, handlelength=3)
+ax.set_ylim(-0.2, 6.9)
 guardar(fig, "fig2_carga")
 
 # ------------------------------------------------------------------ Figura 3: consultas
@@ -132,7 +132,7 @@ def razones(nombre):
 r128, r1gb = razones("consultas.csv"), razones("consultas_1gb.csv")
 etq = {"Q1": "Q1 precio puntual", "Q2": "Q2 sucursal en un día", "Q3": "Q3 historia de un producto",
        "Q4": "Q4 resumen del período"}
-fig, axs = plt.subplots(1, 2, figsize=(6.6, 3.4), sharey=True)
+fig, axs = plt.subplots(1, 2, figsize=(6.3, 3.0), sharey=True)
 filas = [(q, e) for q in ["Q1", "Q2", "Q3", "Q4"] for e in (30, 60, 90)]
 ys = list(range(len(filas)))[::-1]
 for ax, datos, titulo in ((axs[0], r128, "Configuración por defecto (128 MB)"),
@@ -151,17 +151,15 @@ for ax, datos, titulo in ((axs[0], r128, "Configuración por defecto (128 MB)"),
     ax.set_xticks([0.05, 0.1, 0.25, 0.5, 1, 2])
     ax.xaxis.set_major_formatter(coma)
     ax.xaxis.set_minor_formatter(FuncFormatter(lambda *_: ""))
-    ax.set_title(titulo, fontsize=8.5, color=TINTA, loc="left")
+    ax.set_title(titulo, fontsize=7.5, color=TINTA, loc="left")
     ax.grid(axis="y", visible=False)
     for k in range(1, 4):
         ax.axhline(ys[3 * k] + 0.5, color=GRILLA, lw=0.8)
-axs[0].set_yticks(ys, [f"{etq[q] if e == 30 else ''}  {e} d" for q, e in filas], fontsize=7.5)
+axs[0].set_yticks(ys, [f"{etq[q] if e == 30 else ''}  {e} d" for q, e in filas], fontsize=7)
 axs[0].tick_params(axis="y", length=0)
-fig.supxlabel("Tiempo B-WO / tiempo A, mediana e IC 95% (escala log). Punto negro: B-WO más rápida; "
-              "punto hueco: sin diferencia detectable\n(banda gris: ±10%)", fontsize=7.5, color=TINTA2, y=0.0)
-fig.suptitle("B-WO gana siempre en Q2 y Q4; en Q1 y Q3 la ventaja depende de la memoria",
-             fontsize=10, color=TINTA, x=0.02, ha="left")
-fig.tight_layout(rect=(0, 0.05, 1, 0.99), h_pad=0.2)
+fig.supxlabel("Tiempo B-WO / tiempo A: mediana e IC 95%, escala log. Punto negro: B-WO más rápida; "
+              "punto hueco: sin diferencia; banda gris: ±10%", fontsize=7, color=TINTA2, y=0.02)
+fig.tight_layout(rect=(0, 0.04, 1, 1))
 guardar(fig, "fig3_consultas")
 
 # ------------------------------------------------------------------ H5 + Figura 4
@@ -203,22 +201,21 @@ with open(os.path.join(S, "h5.md"), "w", encoding="utf-8") as f:
                 f"{miles(c['fb'])} | {num(c['razon'])} | {num(c['teorica'])} |\n")
     f.write(f"\nCorrelación de Spearman entre p y A/B: {num(rho, 2)} (5 cadenas); sin la cadena del comercio 3: {num(rho4, 2)}.\n")
 
-fig, ax = plt.subplots(figsize=(5.2, 3.2))
+fig, ax = plt.subplots(figsize=(3.2, 2.6))
 xs = [i / 1000 for i in range(5, 22)]
 ax.plot([100 * x for x in xs], [90 / (1 + x * 89) for x in xs], color=TINTA2, lw=1, ls="--")
-ax.text(1.35, 90 / (1 + 0.0135 * 89) + 2.2, "fórmula sin ausencias\nN / (1 + p·(N − 1)), N = 90", fontsize=7.5,
+ax.text(1.38, 47.5, "fórmula sin ausencias\nN / (1 + p·(N − 1)), N = 90", fontsize=6,
         color=TINTA2)
 for c in cad:
     ax.plot(100 * c["p"], c["razon"], "o", color="black", markersize=6.5, markeredgecolor="white", markeredgewidth=1)
-    dx = -0.07 if c["id"] in ("3",) else 0.05
-    ax.text(100 * c["p"] + dx, c["razon"] + (1.6 if c["id"] != "3" else -3.4), c["letra"], fontsize=8,
-            ha="right" if dx < 0 else "left", color=TINTA)
+    if c["id"] == "3":
+        ax.text(100 * c["p"] + 0.05, c["razon"] - 2.6, c["letra"], fontsize=6.5, ha="left", color=TINTA)
+    else:
+        ax.text(100 * c["p"] + 0.05, c["razon"] + 1.6, c["letra"], fontsize=6.5, ha="left", color=TINTA)
 ax.set_xlabel("Precios que cambian por día, p (%)")
 ax.set_ylabel("Filas A / filas B (90 días)")
 ax.xaxis.set_major_formatter(coma)
 ax.set_ylim(15, 60)
-ax.set_title("Más cambios, menos ahorro; los días sin dato\nbajan el ahorro debajo de la fórmula", loc="left",
-             fontsize=10, color=TINTA)
 guardar(fig, "fig4_cadenas")
 
 print("\n".join(RESUMEN))
