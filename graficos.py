@@ -30,8 +30,8 @@ D, T13, S = args.resultados, args.t13, args.salida
 os.makedirs(S, exist_ok=True)
 RESUMEN = []
 
-# Paleta validada (orden categórico fijo): A azul, B-WO naranja, B-GiST aqua
-COL = {"a": "#2a78d6", "b_wo": "#eb6834", "b_gist": "#1baf7a"}
+# Blanco y negro (la plantilla de CoNaIISI lo prefiere): se distingue por tono, rayado, línea y marcador
+COL = {"a": "#000000", "b_wo": "#6e6e6e", "b_gist": "#9a9a9a"}
 NOMBRE = {"a": "A (una fila por día)", "b_wo": "B-WO (tramos + WITHOUT OVERLAPS)", "b_gist": "B-GiST (tramos, sin restricción)"}
 TINTA, TINTA2, GRILLA = "#0b0b0b", "#52514e", "#e4e3de"
 plt.rcParams.update({
@@ -74,7 +74,10 @@ ancho = 0.36
 for i, m in enumerate(["a", "b_wo"]):
     vals = [int(tam[("compacto", e, m)]["bytes_total"]) / 1e6 for e in escalas]
     xs = [k + (i - 0.5) * (ancho + 0.03) for k in range(3)]
-    ax.bar(xs, vals, width=ancho, color=COL[m], label=NOMBRE[m], edgecolor="white", linewidth=1)
+    if m == "a":
+        ax.bar(xs, vals, width=ancho, color="#3a3a3a", label=NOMBRE[m], edgecolor="black", linewidth=0.8)
+    else:
+        ax.bar(xs, vals, width=ancho, color="white", hatch="////", label=NOMBRE[m], edgecolor="black", linewidth=0.8)
     for x, v in zip(xs, vals):
         ax.text(x, v + 8, f"{num(v)} MB", ha="center", va="bottom", fontsize=8, color=TINTA)
 for k, e in enumerate(escalas):
@@ -95,11 +98,11 @@ guardar(fig, "fig1_espacio")
 # ------------------------------------------------------------------ Figura 2: carga diaria
 c90 = leer("carga_e90.csv")
 fig, ax = plt.subplots(figsize=(6.3, 3.0))
-estilos = {"a": ("-", "o"), "b_gist": ("--", "s"), "b_wo": ("-", "^")}
+estilos = {"a": ("-", "o"), "b_gist": (":", "s"), "b_wo": ("--", "^")}
 for m in ["a", "b_gist", "b_wo"]:
     pts = sorted((int(r["dia_n"]), float(r["segundos"])) for r in c90 if r["modelo"] == m)
     ax.plot([p[0] for p in pts], [p[1] for p in pts], ls=estilos[m][0], color=COL[m], lw=1.6,
-            marker=estilos[m][1], markersize=2.6, markevery=6, label=NOMBRE[m])
+            marker=estilos[m][1], markersize=3.2, markevery=6, label=NOMBRE[m])
 ax.set_xlabel("Día de carga (escala 90: 01/02 a 01/05/2025)")
 ax.set_ylabel("Segundos por día")
 ax.set_xlim(0, 91)
@@ -134,14 +137,15 @@ filas = [(q, e) for q in ["Q1", "Q2", "Q3", "Q4"] for e in (30, 60, 90)]
 ys = list(range(len(filas)))[::-1]
 for ax, datos, titulo in ((axs[0], r128, "Configuración por defecto (128 MB)"),
                           (axs[1], r1gb, "Todo en memoria (1 GB + precarga)")):
-    ax.axvspan(0.9, 1.1, color=GRILLA, alpha=0.7, lw=0)
+    ax.axvspan(0.9, 1.1, color="#e6e6e6", lw=0)
     ax.axvline(1, color=TINTA2, lw=0.8)
     for y, (q, e) in zip(ys, filas):
         med, lo, hi = datos[(e, q)]
         dif = not (lo <= 1 <= hi) and (med < 0.9 or med > 1.1)
-        color = COL["b_wo"] if dif and med < 1 else (COL["a"] if dif else TINTA2)
+        color = "black" if dif else "#8a8a8a"
         ax.plot([lo, hi], [y, y], color=color, lw=1.6)
-        ax.plot(med, y, "o", color=color, markersize=4.5, markeredgecolor="white", markeredgewidth=0.8)
+        ax.plot(med, y, "o", markersize=4.8, markerfacecolor=color if dif else "white",
+                markeredgecolor=color, markeredgewidth=1.1)
     ax.set_xscale("log")
     ax.set_xlim(0.03, 2.2)
     ax.set_xticks([0.05, 0.1, 0.25, 0.5, 1, 2])
@@ -153,8 +157,8 @@ for ax, datos, titulo in ((axs[0], r128, "Configuración por defecto (128 MB)"),
         ax.axhline(ys[3 * k] + 0.5, color=GRILLA, lw=0.8)
 axs[0].set_yticks(ys, [f"{etq[q] if e == 30 else ''}  {e} d" for q, e in filas], fontsize=7.5)
 axs[0].tick_params(axis="y", length=0)
-fig.supxlabel("Tiempo B-WO / tiempo A, mediana e IC 95% (escala log). Naranja: B-WO más rápida; "
-              "gris: sin diferencia detectable\n(banda gris: ±10%)", fontsize=7.5, color=TINTA2, y=0.0)
+fig.supxlabel("Tiempo B-WO / tiempo A, mediana e IC 95% (escala log). Punto negro: B-WO más rápida; "
+              "punto hueco: sin diferencia detectable\n(banda gris: ±10%)", fontsize=7.5, color=TINTA2, y=0.0)
 fig.suptitle("B-WO gana siempre en Q2 y Q4; en Q1 y Q3 la ventaja depende de la memoria",
              fontsize=10, color=TINTA, x=0.02, ha="left")
 fig.tight_layout(rect=(0, 0.05, 1, 0.99), h_pad=0.2)
@@ -205,7 +209,7 @@ ax.plot([100 * x for x in xs], [90 / (1 + x * 89) for x in xs], color=TINTA2, lw
 ax.text(1.35, 90 / (1 + 0.0135 * 89) + 2.2, "fórmula sin ausencias\nN / (1 + p·(N − 1)), N = 90", fontsize=7.5,
         color=TINTA2)
 for c in cad:
-    ax.plot(100 * c["p"], c["razon"], "o", color=COL["b_wo"], markersize=7, markeredgecolor="white", markeredgewidth=1)
+    ax.plot(100 * c["p"], c["razon"], "o", color="black", markersize=6.5, markeredgecolor="white", markeredgewidth=1)
     dx = -0.07 if c["id"] in ("3",) else 0.05
     ax.text(100 * c["p"] + dx, c["razon"] + (1.6 if c["id"] != "3" else -3.4), c["letra"], fontsize=8,
             ha="right" if dx < 0 else "left", color=TINTA)
